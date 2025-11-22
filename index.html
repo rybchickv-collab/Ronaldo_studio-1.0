@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>PopkaRonaldo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #0a0018, #000);
+      color: #e0e0ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      width: 100%;
+      padding: 15px 30px;
+      background: rgba(50, 0, 100, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 20px #9b4dff55;
+    }
+    h1 { font-size: 1.2em; color: #c78bff; margin: 0; }
+    .btn {
+      background: #7000ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 15px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { background: #9b4dff; }
+
+    /* 🔥 Исправление для мобильных */
+    @media (max-width: 600px) {
+      #uploadBtn {
+        margin-bottom: 12px;
+        display: block;
+      }
+      header > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      .btn {
+        margin-left: 0;
+        width: 140px;
+        text-align: center;
+      }
+    }
+
+    .container {
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 50px;
+      justify-content: center;
+      max-width: 1500px;
+      width: 100%;
+    }
+
+    .image-box, .controls {
+      background: #111;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 0 25px #4d00ff55;
+    }
+
+    /* 📸 Увеличили фото */
+    .image-box img {
+      max-width: 600px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    /* 🎛 Увеличенная панель фильтров */
+    .controls {
+      min-width: 380px;
+      max-width: 420px;
+      color: #ccc;
+    }
+
+    .controls h3 {
+      margin-top: 0;
+    }
+
+    .controls label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1em;
+      margin-top: 12px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #b266ff;
+    }
+
+    /* 🔧 Мобильная адаптация */
+    @media (max-width: 900px) {
+      .container {
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+      .image-box img {
+        max-width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚽Ronaldo_Studio⚽</h1>
+    <div>
+      <input type="file" id="upload" accept="image/*" hidden>
+      <button class="btn" id="uploadBtn">Загрузить фото</button>
+      <button class="btn" id="downloadBtn">Скачать</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="image-box">
+      <img id="photo" src="https://i07.fotocdn.net/s215/30d83037bc75125e/public_pin_l/2905420567.jpg" alt="Роналду">
+    </div>
+
+    <div class="controls">
+      <h3>🎛️ Фильтры</h3>
+
+      <label>Яркость: <span id="brightnessVal">1.00</span></label>
+      <input type="range" id="brightness" min="0" max="2" step="0.01" value="1">
+
+      <label>Контраст: <span id="contrastVal">1.00</span></label>
+      <input type="range" id="contrast" min="0" max="2" step="0.01" value="1">
+
+      <label>Насыщенность: <span id="saturateVal">1.00</span></label>
+      <input type="range" id="saturate" min="0" max="2" step="0.01" value="1">
+
+      <label>Сепия: <span id="sepiaVal">0.00</span></label>
+      <input type="range" id="sepia" min="0" max="1" step="0.01" value="0">
+
+      <label>Ч/Б: <span id="grayscaleVal">0.00</span></label>
+      <input type="range" id="grayscale" min="0" max="1" step="0.01" value="0">
+
+      <label>Размытие: <span id="blurVal">0.00</span>px</label>
+      <input type="range" id="blur" min="0" max="10" step="0.1" value="0">
+
+      <label>Glow (свечение): <span id="glowVal">0.00</span></label>
+      <input type="range" id="glow" min="0" max="1" step="0.01" value="0">
+    </div>
+  </div>
+
+  <script>
+    const img = document.getElementById('photo');
+    const upload = document.getElementById('upload');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    const sliders = ['brightness','contrast','saturate','sepia','grayscale','blur','glow'];
+    const values = {};
+
+    sliders.forEach(id => {
+      const el = document.getElementById(id);
+      values[id] = el.value;
+      el.addEventListener('input', () => {
+        values[id] = el.value;
+        const valSpan = document.getElementById(id + 'Val');
+        if (valSpan) valSpan.textContent = el.value;
+        updateFilter();
+      });
+    });
+
+    function updateFilter() {
+      img.style.filter = `
+        brightness(${values.brightness})
+        contrast(${values.contrast})
+        saturate(${values.saturate})
+        sepia(${values.sepia})
+        grayscale(${values.grayscale})
+        blur(${values.blur}px)
+      `;
+      img.style.boxShadow = `0 0 ${values.glow * 35}px rgba(170,0,255,${values.glow})`;
+    }
+
+    uploadBtn.onclick = () => upload.click();
+    upload.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        img.src = reader.result;
+        updateFilter();
+      };
+      reader.readAsDataURL(file);
+    };
+
+    downloadBtn.onclick = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const tempImg = new Image();
+      tempImg.crossOrigin = "anonymous";
+      tempImg.src = img.src;
+      tempImg.onload = () => {
+        canvas.width = tempImg.naturalWidth;
+        canvas.height = tempImg.naturalHeight;
+        ctx.filter = `
+          brightness(${values.brightness})
+          contrast(${values.contrast})
+          saturate(${values.saturate})
+          sepia(${values.sepia})
+          grayscale(${values.grayscale})
+          blur(${values.blur}px)
+        `;
+        ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+        const link = document.createElement('a');
+        link.download = 'photoFX_result.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+    };
+
+    window.addEventListener('load', updateFilter);
+  </script>
+</body>
+</html>
